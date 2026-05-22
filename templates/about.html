@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About — CineMatch AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --red: #e50914;
+    --red-dim: #a0050e;
+    --red-glow: rgba(229,9,20,0.18);
+    --red-glow-strong: rgba(229,9,20,0.35);
+    --surface-0: #080808;
+    --surface-1: #0f0f0f;
+    --surface-2: #161616;
+    --surface-3: #1e1e1e;
+    --surface-4: #272727;
+    --border: rgba(255,255,255,0.06);
+    --border-accent: rgba(229,9,20,0.22);
+    --text-primary: #f0ece8;
+    --text-secondary: #8a8480;
+    --text-muted: rgba(240,236,232,0.28);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-width: thin; scrollbar-color: var(--red-dim) rgba(0,0,0,0.3); scroll-behavior: smooth; }
+  body { background: var(--surface-0); font-family: 'DM Sans', sans-serif; color: var(--text-primary); margin: 0; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+  ::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+  /* Film grain */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+    opacity:0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat; background-size: 160px 160px;
+  }
+
+  /* Scroll progress */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0; height: 2px; z-index: 9998;
+    background: linear-gradient(90deg, var(--red), #ff5252);
+    box-shadow: 0 0 8px rgba(229,9,20,0.6);
+    width: 0%; transition: width 0.1s linear;
+  }
+
+  /* Nav */
+  nav {
+    background: rgba(8,8,8,0.88);
+    backdrop-filter: blur(24px) saturate(1.6);
+    border-bottom: 1px solid var(--border);
+    height: 72px;
+    position: fixed; top: 0; width: 100%; z-index: 50;
+    display: flex; align-items: center; padding: 0 4rem;
+    justify-content: space-between;
+  }
+  nav::after {
+    content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+    background: linear-gradient(90deg, transparent, rgba(229,9,20,0.4), transparent);
+  }
+  .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.7rem; letter-spacing:0.08em; color:var(--text-primary); text-decoration:none; }
+  .nav-logo span { color:var(--red); }
+  .nav-link { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-secondary); transition:color 0.2s; padding-bottom:2px; border-bottom:1px solid transparent; text-decoration:none; cursor:pointer; }
+  .nav-link:hover, .nav-link.active { color:var(--text-primary); border-bottom-color:var(--red); }
+  .nav-compare-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 18px; border-radius: 6px;
+    border: 1px solid rgba(229,9,20,0.22);
+    background: rgba(229,9,20,0.07);
+    color: #ffb4aa;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    transition: all 0.25s; cursor: pointer;
+  }
+  .nav-compare-btn:hover { background: rgba(229,9,20,0.15); border-color: rgba(229,9,20,0.45); color: #fff; box-shadow: 0 0 20px rgba(229,9,20,0.18); }
+  .nav-dot { width:6px; height:6px; border-radius:50%; background:var(--red); display:inline-block; box-shadow:0 0 6px var(--red); animation:navDotPulse 2.5s ease-in-out infinite; }
+  @keyframes navDotPulse { 0%,100%{opacity:1;box-shadow:0 0 6px var(--red)} 50%{opacity:0.4;box-shadow:0 0 12px var(--red)} }
+
+  /* Section commons */
+  .section-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--red); display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .section-eyebrow::after { content:''; flex:1; max-width:40px; height:1px; background:var(--red); opacity:0.5; }
+  .section-title { font-family:'Barlow Condensed',sans-serif; font-size:clamp(28px,5vw,48px); font-weight:700; letter-spacing:0.01em; line-height:1.05; color:var(--text-primary); }
+
+  /* Watermark num */
+  .bg-num { position:absolute; right:-40px; top:50%; transform:translateY(-50%); font-family:'Bebas Neue',sans-serif; font-size:260px; color:transparent; -webkit-text-stroke:1px rgba(229,9,20,0.05); line-height:1; user-select:none; pointer-events:none; }
+
+  /* Tip/feature cards */
+  .tip-card { display:flex; gap:18px; padding:24px; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; transition:all 0.3s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
+  .tip-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--red); transform:scaleY(0); transition:transform 0.3s cubic-bezier(0.22,1,0.36,1); transform-origin:bottom; }
+  .tip-card:hover::before { transform:scaleY(1); }
+  .tip-card:hover { transform:translateY(-3px); border-color:var(--border-accent); box-shadow:0 12px 32px rgba(0,0,0,0.35); }
+  .tip-icon-wrap { width:44px; height:44px; border-radius:10px; background:rgba(229,9,20,0.1); border:1px solid rgba(229,9,20,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--red); transition:all 0.3s; }
+  .tip-card:hover .tip-icon-wrap { background:rgba(229,9,20,0.18); box-shadow:0 0 20px rgba(229,9,20,0.2); }
+  .tip-title { font-size:11px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--text-primary); margin-bottom:6px; }
+
+  /* Stat number */
+  .stat-number { font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em; background:linear-gradient(135deg,var(--red) 30%,#ff5252 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+  .stat-label { font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-secondary); margin-top:6px; }
+
+  /* About panel */
+  .about-panel { background:var(--surface-1); border:1px solid var(--border); border-radius:18px; overflow:hidden; position:relative; }
+  .about-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--red),transparent); }
+  .ai-glow { box-shadow:0 0 0 1px var(--border-accent), 0 0 40px var(--red-glow), inset 0 1px 0 rgba(255,255,255,0.04); }
+
+  /* Signal pill */
+  .signal-pill { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); color:var(--text-secondary); padding:6px 13px; border-radius:8px; font-size:12px; font-weight:600; letter-spacing:0.06em; transition:all 0.25s; }
+  .signal-pill:hover { background:rgba(229,9,20,0.08); border-color:rgba(229,9,20,0.25); color:var(--text-primary); }
+  .signal-pill .material-symbols-outlined { font-size:14px; color:var(--red); }
+
+  /* Tech card */
+  .tech-card { background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:24px 16px; text-align:center; transition:all 0.3s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; cursor:default; }
+  .tech-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--red),transparent); opacity:0; transition:opacity 0.3s; }
+  .tech-card:hover { border-color:var(--border-accent); transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--border-accent); }
+  .tech-card:hover::before { opacity:1; }
+  .tech-icon { font-size:2.4rem; margin-bottom:10px; display:block; transition:transform 0.3s; }
+  .tech-card:hover .tech-icon { transform:scale(1.15); }
+  .tech-name { font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-primary); }
+  .tech-sub { font-size:11px; color:var(--text-secondary); margin-top:4px; }
+
+  /* Workflow step */
+  .workflow-step { background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; position:relative; flex:1; min-width:120px; transition:border-color 0.3s; }
+  .workflow-step:hover { border-color:var(--border-accent); }
+  .workflow-arrow { display:flex; align-items:center; color:var(--red); flex-shrink:0; opacity:0.6; }
+
+  /* Feature card */
+  .feat-card { background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:24px; transition:all 0.3s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
+  .feat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--red),transparent); opacity:0; transition:opacity 0.3s; }
+  .feat-card:hover { border-color:var(--border-accent); transform:translateY(-4px); box-shadow:0 16px 36px rgba(0,0,0,0.35); }
+  .feat-card:hover::after { opacity:1; }
+  .feat-icon { width:48px; height:48px; border-radius:12px; background:rgba(229,9,20,0.1); border:1px solid rgba(229,9,20,0.2); display:flex; align-items:center; justify-content:center; color:var(--red); margin-bottom:16px; transition:all 0.3s; }
+  .feat-card:hover .feat-icon { background:rgba(229,9,20,0.18); box-shadow:0 0 20px rgba(229,9,20,0.2); }
+
+  /* Challenge card */
+  .challenge-card { background:var(--surface-2); border:1px solid var(--border); border-left:3px solid var(--red); border-radius:12px; padding:20px 24px; transition:all 0.3s; }
+  .challenge-card:hover { background:var(--surface-3); transform:translateX(4px); }
+
+  /* Future card */
+  .future-card { display:flex; align-items:flex-start; gap:14px; padding:18px; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; transition:all 0.3s; }
+  .future-card:hover { border-color:var(--border-accent); }
+
+  /* Developer card */
+  .dev-card { background:var(--surface-1); border:1px solid var(--border); border-radius:20px; padding:40px; position:relative; overflow:hidden; }
+  .dev-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--red),transparent); }
+
+  /* ML concept card */
+  .ml-card { background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:28px; transition:border-color 0.3s; }
+  .ml-card:hover { border-color:var(--border-accent); }
+  .ml-tag { display:inline-flex; align-items:center; gap:6px; background:rgba(229,9,20,0.08); border:1px solid rgba(229,9,20,0.2); color:#ffb4aa; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:0.06em; margin-bottom:12px; }
+
+  /* Dataset tag */
+  .dataset-pill { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text-secondary); padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600; transition:all 0.2s; }
+  .dataset-pill:hover { background:rgba(229,9,20,0.07); border-color:var(--border-accent); color:var(--text-primary); }
+
+  /* Reveal animation */
+  .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1); }
+  .reveal.visible { opacity:1; transform:none; }
+
+  /* Section divider */
+  .sec-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(229,9,20,0.2),rgba(255,255,255,0.04),rgba(229,9,20,0.2),transparent); border:none; margin:0; }
+
+  /* Footer */
+  footer { background:var(--surface-0); border-top:1px solid var(--border); position:relative; }
+  footer::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--red),transparent); opacity:0.5; }
+  .footer-logo { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:0.08em; }
+  .footer-logo span { color:var(--red); }
+
+  /* Code monospace */
+  .mono { font-family:'Courier New',monospace; background:rgba(229,9,20,0.07); border:1px solid rgba(229,9,20,0.15); color:#ffb4aa; padding:3px 8px; border-radius:5px; font-size:12px; }
+
+  /* Back-to-top */
+  #btt { position:fixed; bottom:32px; right:32px; width:44px; height:44px; border-radius:50%; background:var(--red); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(229,9,20,0.4); opacity:0; pointer-events:none; transition:opacity 0.3s, transform 0.3s; z-index:500; }
+  #btt.show { opacity:1; pointer-events:auto; }
+  #btt:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(229,9,20,0.5); }
+
+  /* Progress bar dots for workflow */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes titleShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+  @keyframes ambientDrift { from{transform:translateX(-50%) translateY(0)} to{transform:translateX(-50%) translateY(-30px)} }
+  @keyframes countUp { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+
+  /* Hero */
+  .about-hero { min-height:360px; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden; background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(229,9,20,0.1) 0%, transparent 70%), var(--surface-0); }
+  .about-hero::before { content:''; position:absolute; width:800px; height:800px; background:radial-gradient(circle, rgba(229,9,20,0.06) 0%, transparent 65%); top:-200px; left:50%; transform:translateX(-50%); animation:ambientDrift 14s ease-in-out infinite alternate; }
+  .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(60px,10vw,110px); line-height:0.9; letter-spacing:0.04em; }
+  .hero-shimmer { background:linear-gradient(105deg,var(--text-primary) 20%,rgba(255,255,255,0.5) 50%,var(--text-primary) 80%); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:titleShimmer 6s linear infinite; }
+
+  @media (max-width:768px) {
+    nav { padding:0 1.5rem; }
+    .bg-num { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<!-- Back to top -->
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+  <span class="material-symbols-outlined" style="font-size:20px;">arrow_upward</span>
+</button>
+
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 h-[72px] px-6 md:px-16 flex items-center" style="background:rgba(8,8,8,0.88);backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid rgba(255,255,255,0.06);">
+  <!-- Logo left -->
+  <div class="flex-shrink-0">
+    <h1 class="nav-logo">Cine<span>Match</span></h1>
+  </div>
+  <!-- Nav links center -->
+  <div class="hidden md:flex flex-1 justify-center gap-10 items-center">
+    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link" onclick="scrollToGenres()" style="cursor:pointer">Genres</a>
+    <a class="nav-link active" href="/about">About</a>
+  </div>
+  <!-- Compare btn right -->
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <button onclick="openCompareModal()" class="nav-compare-btn hidden md:flex">
+      <span class="material-symbols-outlined" style="font-size:16px">compare_arrows</span>
+      Compare Movies
+    </button>
+    <button onclick="openCompareModal()" class="md:hidden" style="background:none;border:none;cursor:pointer;padding:8px;color:var(--text-secondary);border-radius:6px;">
+      <span class="material-symbols-outlined">compare_arrows</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+<div style="height:72px;"></div>
+<section class="about-hero py-20 px-6">
+  <div style="position:relative;z-index:2;max-width:760px;margin:0 auto;">
+    <div style="display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--red);margin-bottom:20px;">
+      <span style="width:28px;height:1px;background:var(--red);opacity:0.6;display:block;"></span>
+      AI-Powered Cinema Intelligence
+      <span style="width:28px;height:1px;background:var(--red);opacity:0.6;display:block;"></span>
+    </div>
+    <div class="hero-title hero-shimmer" style="margin-bottom:4px;">ABOUT</div>
+    <div class="hero-title" style="color:var(--red);">CINEMATCH AI</div>
+    <p style="font-size:16px;color:var(--text-secondary);line-height:1.75;margin-top:24px;max-width:560px;margin-left:auto;margin-right:auto;">A deep dive into the technology, machine learning, dataset, and vision behind the platform.</p>
+    <!-- Breadcrumb -->
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:28px;font-size:12px;color:var(--text-muted);">
+      <a href="/" style="color:var(--text-secondary);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'">Home</a>
+      <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
+      <span style="color:var(--red);">About</span>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── A: PROJECT INTRODUCTION ──────────────────────────────────────────── -->
+<section id="intro" class="py-20 px-6 md:px-16" style="background:var(--surface-0);position:relative;overflow:hidden;">
+  <div class="bg-num">01</div>
+  <div style="max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:48px;" class="reveal">
+    <div>
+      <div class="section-eyebrow">Section A</div>
+      <h2 class="section-title">Project <span style="color:var(--red);">Introduction</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;">
+      <div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:700;color:var(--text-primary);margin-bottom:16px;letter-spacing:0.02em;">What is CineMatch AI?</h3>
+        <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;margin-bottom:20px;">CineMatch AI is an intelligent, AI-powered movie discovery platform built to solve the single biggest problem in entertainment: <em style="color:var(--text-primary);">finding a film you'll genuinely love</em>. Rather than relying on trending charts or crowd-sourced ratings, it understands the DNA of cinema itself.</p>
+        <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;">Every movie in the TMDB 5000 dataset has been vectorized into a multi-dimensional feature space — encoding its genres, themes, cast, director, plot, and cinematic metadata. When you search for a film, CineMatch AI instantly computes mathematical similarity across 4,803 movies and returns the closest matches.</p>
+      </div>
+      <div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:700;color:var(--text-primary);margin-bottom:16px;letter-spacing:0.02em;">Purpose of the System</h3>
+        <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;margin-bottom:20px;">The system was built as an academic and practical exploration into content-based filtering — a branch of recommender systems that works without user history or behavioral data. This makes it especially powerful for:</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;">
+            <span class="material-symbols-outlined" style="color:var(--red);font-size:18px;flex-shrink:0;">check_circle</span>
+            <span style="font-size:14px;color:var(--text-primary);">Cold-start scenarios — no viewing history required</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;">
+            <span class="material-symbols-outlined" style="color:var(--red);font-size:18px;flex-shrink:0;">check_circle</span>
+            <span style="font-size:14px;color:var(--text-primary);">Discovering niche and non-mainstream films</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;">
+            <span class="material-symbols-outlined" style="color:var(--red);font-size:18px;flex-shrink:0;">check_circle</span>
+            <span style="font-size:14px;color:var(--text-primary);">Privacy-first — zero personal data collected</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;">
+            <span class="material-symbols-outlined" style="color:var(--red);font-size:18px;flex-shrink:0;">check_circle</span>
+            <span style="font-size:14px;color:var(--text-primary);">Real-time inference from a pre-built similarity matrix</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── B: PROBLEM STATEMENT ─────────────────────────────────────────────── -->
+<section id="problem" class="py-20 px-6 md:px-16" style="background:var(--surface-1);position:relative;overflow:hidden;">
+  <div class="bg-num">02</div>
+  <div style="max-width:1280px;margin:0 auto;" class="reveal">
+    <div class="section-eyebrow">Section B</div>
+    <h2 class="section-title" style="margin-bottom:48px;">The <span style="color:var(--red);">Problem</span></h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <div class="tip-card">
+        <div class="tip-icon-wrap"><span class="material-symbols-outlined" style="font-size:22px;">search_off</span></div>
+        <div>
+          <div class="tip-title">Difficulty Finding Movies</div>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.75;">With thousands of films across dozens of streaming platforms, decision fatigue is real. Simple filters by genre or star-rating don't capture the nuanced qualities that make a film personally meaningful — its tone, style, and thematic resonance.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon-wrap"><span class="material-symbols-outlined" style="font-size:22px;">all_inclusive</span></div>
+        <div>
+          <div class="tip-title">Information Overload</div>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.75;">Platform algorithms optimize for engagement, not taste-matching. They push blockbusters and trending titles, drowning out hidden gems. The result: viewers scroll endlessly and often give up, defaulting to familiar titles they've already seen.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon-wrap"><span class="material-symbols-outlined" style="font-size:22px;">psychology_alt</span></div>
+        <div>
+          <div class="tip-title">Need for Intelligent Recommendations</div>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.75;">Existing collaborative filtering systems fail for niche tastes and new users. What's needed is an intelligent engine that understands a movie's intrinsic content — its themes, cast, and cinematic DNA — and matches it to similar films without depending on user behavior data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── C: SOLUTION ─────────────────────────────────────────────────────── -->
+<section id="solution" class="py-20 px-6 md:px-16" style="background:var(--surface-0);position:relative;overflow:hidden;">
+  <div class="bg-num">03</div>
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;" class="reveal">
+    <div>
+      <div class="section-eyebrow">Section C</div>
+      <h2 class="section-title" style="margin-bottom:24px;">The <span style="color:var(--red);">Solution</span></h2>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;margin-bottom:20px;"><strong style="color:var(--text-primary);">Content-Based Filtering</strong> is at the core of CineMatch AI. Unlike collaborative filtering (which relies on what other users watch), content-based filtering analyzes what a movie <em>is</em> — its plot, cast, director, themes, and genre profile — and finds other films with a similar cinematic fingerprint.</p>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;margin-bottom:24px;">The <strong style="color:var(--text-primary);">recommendation engine</strong> is built on a multi-signal TF-IDF pipeline that transforms each movie into a high-dimensional vector. A pre-computed cosine similarity matrix then enables instant lookups at query time.</p>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;"><strong style="color:var(--text-primary);">Similarity matching</strong> works by measuring the angle between two movie vectors in this high-dimensional space. Films whose weighted feature vectors point in nearly the same direction are deemed similar — regardless of era, language, or box office performance.</p>
+    </div>
+    <div class="about-panel ai-glow p-8">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:navDotPulse 2.5s ease-in-out infinite;"></div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--red);">Model Active</span>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.04em;color:var(--text-primary);margin-bottom:8px;">Multi-Signal Pipeline</div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">Each movie is encoded as a weighted feature vector across 6 content signals:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span class="signal-pill"><span class="material-symbols-outlined">label</span>Genres ×4</span>
+        <span class="signal-pill"><span class="material-symbols-outlined">key</span>Keywords ×3</span>
+        <span class="signal-pill"><span class="material-symbols-outlined">movie</span>Director ×3</span>
+        <span class="signal-pill"><span class="material-symbols-outlined">group</span>Cast ×3</span>
+        <span class="signal-pill"><span class="material-symbols-outlined">article</span>Overview ×2</span>
+        <span class="signal-pill"><span class="material-symbols-outlined">format_quote</span>Tagline ×1</span>
+      </div>
+      <div style="margin-top:20px;padding:14px;background:rgba(229,9,20,0.05);border:1px solid var(--border-accent);border-radius:10px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:6px;">Numeric signals also blended</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <span style="font-size:13px;color:var(--text-primary);">⭐ Vote Average</span>
+          <span style="font-size:13px;color:var(--text-primary);">📊 Popularity</span>
+          <span style="font-size:13px;color:var(--text-primary);">⏱ Runtime</span>
+          <span style="font-size:13px;color:var(--text-primary);">📅 Release Year</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── D: MACHINE LEARNING ──────────────────────────────────────────────── -->
+<section id="ml" class="py-20 px-6 md:px-16" style="background:var(--surface-1);position:relative;overflow:hidden;">
+  <div class="bg-num">04</div>
+  <div style="max-width:1280px;margin:0 auto;" class="reveal">
+    <div class="section-eyebrow">Section D</div>
+    <h2 class="section-title" style="margin-bottom:48px;">Machine <span style="color:var(--red);">Learning</span></h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+
+      <!-- TF-IDF -->
+      <div class="ml-card">
+        <div class="ml-tag"><span class="material-symbols-outlined" style="font-size:13px;">functions</span>Algorithm 1</div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text-primary);margin-bottom:14px;">TF-IDF Vectorization</h3>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px;"><strong style="color:var(--text-primary);">Term Frequency–Inverse Document Frequency</strong> is a numerical technique that converts raw text into meaningful numeric vectors.</p>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">TF (Term Frequency)</strong> Measures how often a word appears in a movie's feature text. Frequent terms get higher weight.
+          </li>
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">IDF (Inverse Document Frequency)</strong> Down-weights common words that appear in many movies (e.g. "the", "film") and boosts rare, distinctive terms.
+          </li>
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Result</strong> A sparse high-dimensional vector per movie — rich with semantic meaning, ready for similarity computation.
+          </li>
+        </ul>
+        <div style="margin-top:16px;padding:12px;background:rgba(229,9,20,0.05);border-radius:8px;border:1px solid var(--border-accent);">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Implementation</div>
+          <code class="mono">sklearn.TfidfVectorizer</code>
+        </div>
+      </div>
+
+      <!-- Cosine Similarity -->
+      <div class="ml-card">
+        <div class="ml-tag"><span class="material-symbols-outlined" style="font-size:13px;">radar</span>Algorithm 2</div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text-primary);margin-bottom:14px;">Cosine Similarity</h3>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px;"><strong style="color:var(--text-primary);">Cosine Similarity</strong> measures the angle between two feature vectors in high-dimensional space — irrespective of their magnitude.</p>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Score Range: 0 → 1</strong> A score of 1.0 means identical content. 0.0 means completely unrelated. Most recommendations score 0.4–0.85.
+          </li>
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Length-Invariant</strong> Works correctly regardless of how much text a movie has — a short tagline and a long plot both produce comparable similarity scores.
+          </li>
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Pre-Computed Matrix</strong> The 4,803×4,803 similarity matrix is computed at startup, enabling sub-millisecond lookups at query time.
+          </li>
+        </ul>
+        <div style="margin-top:16px;padding:12px;background:rgba(229,9,20,0.05);border-radius:8px;border:1px solid var(--border-accent);">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Implementation</div>
+          <code class="mono">sklearn.cosine_similarity</code>
+        </div>
+      </div>
+
+      <!-- Content-Based Filtering -->
+      <div class="ml-card">
+        <div class="ml-tag"><span class="material-symbols-outlined" style="font-size:13px;">filter_alt</span>Algorithm 3</div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text-primary);margin-bottom:14px;">Content-Based Filtering</h3>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px;"><strong style="color:var(--text-primary);">Content-Based Filtering</strong> is the overall recommendation strategy — using item attributes (content) rather than user behavior to determine similarity.</p>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">No User Data Needed</strong> Completely privacy-safe. Recommendations depend only on the movie you searched — not who you are.
+          </li>
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Multi-Field Signals</strong> Combines genres, keywords, cast, director, overview, and tagline — each weighted by relevance — into a single unified feature string per movie.
+          </li>
+          <li style="font-size:13px;color:var(--text-secondary);line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);">
+            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Explainable</strong> Unlike neural network black boxes, TF-IDF + cosine similarity is fully interpretable — you can trace exactly why two films were matched.
+          </li>
+        </ul>
+        <div style="margin-top:16px;padding:12px;background:rgba(229,9,20,0.05);border-radius:8px;border:1px solid var(--border-accent);">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Paradigm</div>
+          <code class="mono">Item-Item Similarity</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── E: DATASET ──────────────────────────────────────────────────────── -->
+<section id="dataset" class="py-20 px-6 md:px-16" style="background:var(--surface-0);position:relative;overflow:hidden;">
+  <div class="bg-num">05</div>
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;" class="reveal">
+    <div>
+      <div class="section-eyebrow">Section E</div>
+      <h2 class="section-title" style="margin-bottom:24px;">Dataset <span style="color:var(--red);">Information</span></h2>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;margin-bottom:20px;">CineMatch AI is powered by the <strong style="color:var(--text-primary);">TMDB 5000 Movies Dataset</strong> — a comprehensive, publicly available collection of 4,803 Hollywood and international films sourced from The Movie Database (TMDB).</p>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.85;margin-bottom:28px;">The dataset includes rich metadata across two complementary CSV files — <code class="mono">tmdb_5000_movies.csv</code> and <code class="mono">tmdb_5000_credits.csv</code> — which are joined on <code class="mono">movie_id</code> to create a unified feature source.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">label</span>20 Genres</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">key</span>TMDB Keywords</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">group</span>Full Cast Lists</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">movie</span>Directors</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">article</span>Plot Overviews</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">star</span>Vote Avg &amp; Count</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">payments</span>Budget &amp; Revenue</span>
+        <span class="dataset-pill"><span class="material-symbols-outlined" style="font-size:16px;color:var(--red);">schedule</span>Runtime</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;align-items:center;gap:18px;">
+        <div style="width:52px;height:52px;border-radius:12px;background:rgba(229,9,20,0.1);border:1px solid rgba(229,9,20,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span class="material-symbols-outlined" style="color:var(--red);font-size:26px;">database</span></div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.04em;background:linear-gradient(135deg,var(--red),#ff5252);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">4,803</div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-secondary);">Movies in dataset</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--red),#ff5252);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">45+</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Data Columns</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--red),#ff5252);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">6</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Feature Signals</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--red),#ff5252);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">1960</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Earliest Release</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--red),#ff5252);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">2017</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Latest Release</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── F: TECHNOLOGY STACK ──────────────────────────────────────────────── -->
+<section id="stack" class="py-20 px-6 md:px-16" style="background:var(--surface-1);position:relative;overflow:hidden;">
+  <div class="bg-num">06</div>
+  <div style="max-width:1280px;margin:0 auto;" class="reveal">
+    <div class="section-eyebrow">Section F</div>
+    <h2 class="section-title" style="margin-bottom:12px;">Technology <span style="color:var(--red);">Stack</span></h2>
+    <p style="font-size:16px;color:var(--text-secondary);line-height:1.75;margin-bottom:48px;max-width:600px;">CineMatch AI is built on a modern, lightweight stack that balances rapid development, ML power, and cinematic UI quality.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+
+      <div class="tech-card">
+        <span class="tech-icon">🐍</span>
+        <div class="tech-name">Python</div>
+        <div class="tech-sub">Backend core & ML engine</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">⚗️</span>
+        <div class="tech-name">Flask</div>
+        <div class="tech-sub">REST API framework</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">🌐</span>
+        <div class="tech-name">HTML5</div>
+        <div class="tech-sub">Semantic structure</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">💨</span>
+        <div class="tech-name">Tailwind CSS</div>
+        <div class="tech-sub">Utility-first styling</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">⚡</span>
+        <div class="tech-name">JavaScript</div>
+        <div class="tech-sub">Interactive frontend</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">🔬</span>
+        <div class="tech-name">Scikit-learn</div>
+        <div class="tech-sub">TF-IDF + cosine similarity</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">🐼</span>
+        <div class="tech-name">Pandas</div>
+        <div class="tech-sub">Data wrangling &amp; ETL</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-icon">🎬</span>
+        <div class="tech-name">TMDB Dataset</div>
+        <div class="tech-sub">4,803 movie records</div>
+      </div>
+    </div>
+
+    <!-- Stack architecture note -->
+    <div style="margin-top:32px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;align-items:flex-start;gap:16px;">
+      <div style="width:44px;height:44px;border-radius:10px;background:rgba(229,9,20,0.1);border:1px solid rgba(229,9,20,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span class="material-symbols-outlined" style="color:var(--red);font-size:20px;">architecture</span></div>
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Architecture Note</div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.75;">The Python/Flask backend handles data loading, TF-IDF vectorization, cosine similarity computation, and REST API endpoints. The frontend is a pure HTML/CSS/JavaScript single-page application that communicates with the backend via <code class="mono">fetch()</code> API calls — no frameworks required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sec-divider"/>
+
+<!-- ── H: FEATURES ─────────────────────────────────────────────────────── -->
+<section id="features" class="py-20 px-6 md:px-16" style="background:var(--surface-1);position:relative;overflow:hidden;">
+  <div class="bg-num">08</div>
+  <div style="max-width:1280px;margin:0 auto;" class="reveal">
+    <div class="section-eyebrow">Section H</div>
+    <h2 class="section-title" style="margin-bottom:12px;">Platform <span style="color:var(--red);">Features</span></h2>
+    <p style="font-size:16px;color:var(--text-secondary);line-height:1.75;margin-bottom:48px;max-width:600px;">CineMatch AI packs a full suite of discovery tools, each designed to surface great cinema in a different way.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">auto_awesome</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">AI Recommendations</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Multi-signal TF-IDF + cosine similarity engine surfaces the 10 most cinematically similar films to any movie in the database.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">casino</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Random Movie</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">"Surprise Me" picks a random high-rated film and instantly generates recommendations — perfect for breaking decision fatigue.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">compare_arrows</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Compare Movies</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Side-by-side comparison of two films across ratings, box office, genre DNA, director, runtime, and overall similarity score.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">category</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Genre Discovery</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Browse by genre with dedicated cards for Action, Comedy, Horror, Sci-Fi, Animation, Romance, Mystery, and Adventure.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">trending_up</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Trending Movies</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Bayesian-ranked top titles from the TMDB dataset displayed in a cinematic horizontal scroll with poster art and metadata.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">manage_search</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Smart Search</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Real-time autocomplete with fuzzy matching suggests titles as you type, with year and rating shown in the dropdown.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">palette</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Cinematic UI</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Full dark theme with film grain overlay, custom cursor, scroll-triggered reveals, and a cinematic red/black design language.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon"><span class="material-symbols-outlined" style="font-size:22px;">info</span></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:8px;">Movie Detail Modal</div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">Click any movie to see full TMDB details: poster, tagline, genres, cast, director, budget, revenue, runtime, and plot overview.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer id="site-footer" style="background:var(--surface-0);position:relative;overflow:hidden;">
+
+  <!-- Ambient red glow top -->
+  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0.6;"></div>
+  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:120px;background:radial-gradient(ellipse at 50% 0%,rgba(229,9,20,0.07) 0%,transparent 70%);pointer-events:none;"></div>
+
+  <!-- Film strip perforations top -->
+  <div style="position:absolute;top:0;left:0;right:0;height:18px;display:flex;align-items:center;gap:0;overflow:hidden;opacity:0.18;">
+    <div id="footer-film-strip" style="display:flex;gap:0;width:100%;"></div>
+  </div>
+
+  <!-- Main footer grid -->
+  <div class="max-w-7xl mx-auto px-6 md:px-16" style="padding-top:72px;padding-bottom:48px;">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
+
+      <!-- Col 1: Brand -->
+      <div class="md:col-span-1">
+        <h4 class="footer-logo mb-3">Cine<span>Match</span> <span style="font-size:0.85rem;font-family:'DM Sans',sans-serif;font-weight:300;letter-spacing:0.02em;color:var(--text-secondary);">AI</span></h4>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.8;max-width:220px;margin-bottom:20px;">Cinematic intelligence powered by TMDB 5000 and multi-signal machine learning.</p>
+        <a href="https://github.com" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:var(--text-secondary);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:all 0.2s;cursor:pointer;"
+           onmouseover="this.style.background='rgba(255,255,255,0.09)';this.style.borderColor='rgba(255,255,255,0.18)';this.style.color='var(--text-primary)'"
+           onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.09)';this.style.color='var(--text-secondary)';">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+
+      <!-- Col 2: Navigate -->
+      <div>
+        <h5 style="font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+          <span style="width:16px;height:1px;background:var(--red);display:inline-block;"></span>Navigate
+        </h5>
+        <ul style="display:flex;flex-direction:column;gap:12px;">
+          <li><a href="/" class="footer-nav-link" style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--red);">home</span>Home
+          </a></li>
+          <li><a onclick="scrollToGenres()" class="footer-nav-link" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--red);">category</span>Genres
+          </a></li>
+          <li><a href="/about" class="footer-nav-link" style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--red);">info</span>About
+          </a></li>
+          <li><a onclick="openCompareModal()" class="footer-nav-link" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--red);">compare_arrows</span>Compare Movies
+          </a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Built With -->
+      <div>
+        <h5 style="font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+          <span style="width:16px;height:1px;background:var(--red);display:inline-block;"></span>Built With
+        </h5>
+        <ul style="display:flex;flex-direction:column;gap:12px;">
+          <li>
+            <a href="https://python.org" target="_blank" rel="noopener" class="footer-nav-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+              <span style="width:28px;height:28px;border-radius:6px;background:rgba(255,212,59,0.08);border:1px solid rgba(255,212,59,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🐍</span>
+              <span><div style="font-size:12px;font-weight:600;color:var(--text-primary);">Python + Flask</div><div style="font-size:10px;color:var(--text-secondary);">Backend framework</div></span>
+            </a>
+          </li>
+          <li>
+            <a href="https://scikit-learn.org" target="_blank" rel="noopener" class="footer-nav-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+              <span style="width:28px;height:28px;border-radius:6px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🔬</span>
+              <span><div style="font-size:12px;font-weight:600;color:var(--text-primary);">Scikit-learn TF-IDF</div><div style="font-size:10px;color:var(--text-secondary);">ML engine</div></span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata" target="_blank" rel="noopener" class="footer-nav-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+              <span style="width:28px;height:28px;border-radius:6px;background:rgba(32,178,216,0.08);border:1px solid rgba(32,178,216,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🎬</span>
+              <span><div style="font-size:12px;font-weight:600;color:var(--text-primary);">TMDB 5000</div><div style="font-size:10px;color:var(--text-secondary);">Movie dataset</div></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="footer-nav-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+              <span style="width:28px;height:28px;border-radius:6px;background:rgba(229,9,20,0.08);border:1px solid rgba(229,9,20,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">📐</span>
+              <span><div style="font-size:12px;font-weight:600;color:var(--text-primary);">Cosine Similarity</div><div style="font-size:10px;color:var(--text-secondary);">Matching algorithm</div></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 4: How It Works -->
+      <div>
+        <h5 style="font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+          <span style="width:16px;height:1px;background:var(--red);display:inline-block;"></span>How It Works
+        </h5>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <div style="width:24px;height:24px;border-radius:50%;background:rgba(229,9,20,0.12);border:1px solid rgba(229,9,20,0.25);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--red);flex-shrink:0;margin-top:1px;">1</div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">Search a movie</div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;">Type any title from the TMDB 5000 database</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <div style="width:24px;height:24px;border-radius:50%;background:rgba(229,9,20,0.12);border:1px solid rgba(229,9,20,0.25);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--red);flex-shrink:0;margin-top:1px;">2</div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">AI decodes its DNA</div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;">TF-IDF analyzes genre, cast, director, plot &amp; keywords</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <div style="width:24px;height:24px;border-radius:50%;background:rgba(229,9,20,0.12);border:1px solid rgba(229,9,20,0.25);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--red);flex-shrink:0;margin-top:1px;">3</div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">Get matched films</div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;">Cosine similarity surfaces your closest cinematic matches</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div style="margin-top:52px;height:1px;background:linear-gradient(90deg,transparent,rgba(229,9,20,0.25),rgba(255,255,255,0.06),rgba(229,9,20,0.25),transparent);"></div>
+
+    <!-- Bottom bar -->
+    <div style="margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
+
+      <!-- Left: copyright + status -->
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:navDotPulse 2.5s ease-in-out infinite;"></div>
+          <span style="font-size:11px;color:rgba(240,236,232,0.3);letter-spacing:0.08em;">Live</span>
+        </div>
+        <span style="font-size:11px;color:rgba(240,236,232,0.2);">|</span>
+        <span style="font-size:11px;color:rgba(240,236,232,0.3);letter-spacing:0.06em;">© <span id="footer-year"></span> CineMatch AI — All rights reserved</span>
+        <span style="font-size:11px;color:rgba(240,236,232,0.2);">|</span>
+        <span style="font-size:11px;color:rgba(240,236,232,0.3);">Powered by cinematic DNA matching</span>
+      </div>
+
+      <!-- Right: Back to top -->
+      <button onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;background:rgba(229,9,20,0.07);border:1px solid rgba(229,9,20,0.2);color:#ffb4aa;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;"
+        onmouseover="this.style.background='rgba(229,9,20,0.15)';this.style.borderColor='rgba(229,9,20,0.4)';this.style.color='#fff'"
+        onmouseout="this.style.background='rgba(229,9,20,0.07)';this.style.borderColor='rgba(229,9,20,0.2)';this.style.color='#ffb4aa'">
+        <span class="material-symbols-outlined" style="font-size:15px;">arrow_upward</span>
+        Back to Top
+      </button>
+    </div>
+
+    <!-- Film strip bottom perforations -->
+    <div style="margin-top:28px;display:flex;gap:6px;justify-content:center;opacity:0.1;" id="footer-film-holes"></div>
+
+  </div>
+</footer>
+
+<script>
+// Scroll progress bar
+(function() {
+  const bar = document.getElementById('scroll-progress');
+  const btt = document.getElementById('btt');
+  function update() {
+    const st = window.scrollY;
+    const dh = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (dh > 0 ? (st / dh) * 100 : 0) + '%';
+    btt.classList.toggle('show', st > 400);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+// Scroll reveal
+(function() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i % 3) * 0.08 + 's';
+    obs.observe(el);
+  });
+})();
+
+// Animated counter
+function animateCounter(el, target, suffix, duration) {
+  let start = null;
+  const step = ts => {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const val = Math.round(ease * target);
+    el.textContent = val.toLocaleString() + (suffix || '');
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// Active nav link on scroll
+(function() {
+  const sections = ['intro','problem','solution','ml','dataset','stack','features'];
+  const links = document.querySelectorAll('.nav-link[href^="#"]');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el);
+  });
+})();
+
+function scrollToGenres() {
+  window.location.href = '/#genres-section';
+}
+
+function openCompareModal() {
+  window.location.href = '/';
+}
+
+(function() {
+  const yearEl = document.getElementById('footer-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  const holes = document.getElementById('footer-film-holes');
+  if (holes) {
+    for (let i = 0; i < 28; i++) {
+      const h = document.createElement('div');
+      h.style.cssText = 'width:14px;height:8px;border-radius:2px;background:var(--text-primary);flex-shrink:0;';
+      holes.appendChild(h);
+    }
+  }
+})();
+</script>
+</body>
+</html>
